@@ -1,2 +1,12 @@
 *.class
 *.log
+
+project/
+.idea/
+.bsp/
+out/
+
+.DS_Store
+.settings
+*.iml
+/target/*
