@@ -12,10 +12,10 @@ final case class MongoDatabaseInitializer(dataSource: DataSource) extends Databa
   override def initializer(
       dbConfig: DBConfig): ZIO[DataSource, Throwable, Unit] = {
     for {
-      _ <- Console.printLine(s"Attempting to establish connection to MongoDB host ${dbConfig.hostname}, on port: ${dbConfig.port} with db ${dbConfig.name}")
+      _ <- Console.printLine(s"Attempting to establish connection to MongoDB host ${dbConfig.hostname}, on port: ${dbConfig.port} with db ${dbConfig.dbName}")
       client <- ZIO.attempt(MongoClient(s"mongodb://${dbConfig.hostname}:${dbConfig.port}"))
-      db <- ZIO.attempt(client.getDatabase(dbConfig.name)) <* Console.printLine("Established connection with database successfully!")
-      _ <- dataSource.setCtx(DatabaseContext(db))
+      dbName <- ZIO.attempt(client.getDatabase(dbConfig.dbName)) <* Console.printLine("Established connection with database successfully!")
+      _ <- dataSource.setCtx(DatabaseContext(dbName))
     } yield ()
   }
 }
