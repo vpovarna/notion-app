@@ -13,7 +13,7 @@ final case class DataSourceLive(ref: Ref[DatabaseContext]) extends DataSource {
 }
 
 object DataSourceLive {
-  def live: ZLayer[Any, Nothing, DataSourceLive] = ZLayer.scoped {
+  def live: ZLayer[Any, Nothing, DataSource] = ZLayer.scoped {
     for {
       ref <- Ref.make[DatabaseContext](DatabaseContext.initialize)
     } yield DataSourceLive(ref)
