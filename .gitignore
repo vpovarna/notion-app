@@ -4,6 +4,9 @@
 project/
 .idea/
 .bsp/
+.vscode/
+.bloop/
+.metals/
 out/
 
 .DS_Store
