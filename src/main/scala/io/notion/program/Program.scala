@@ -1,22 +1,51 @@
 package io.notion.program
 
+import java.util.UUID
+
+import io.notion.config.NotionAppConfig
+import io.notion.repository.DBConfig
 import io.notion.repository.mongo.MongoDatabaseInitializer
-import io.notion.repository.{DataSource, DataSourceLive}
-import io.notion.service.NotesService
+import io.notion.utils.Helpers.GenericObservable
+import org.mongodb.scala.{Document, MongoCollection}
 import zio._
 
 object Program {
 
-  lazy val dataSourceLayer: ZLayer[Any, Nothing, DataSource] = DataSourceLive.live
-  lazy val mongoDatabaseLayer: ZLayer[DataSource, Nothing, MongoDatabaseInitializer] = MongoDatabaseInitializer.live
-  lazy val serverLayer: ZLayer[Any, Nothing, NotesService] = NotesService.live
+  def getMongoCollection(
+      dbConfig: DBConfig
+  ): ZIO[Any, Throwable, MongoCollection[Document]] =
+    for {
+      mongoDatabaseContext <- MongoDatabaseInitializer(dbConfig).initialize
+      collection <- ZIO.attempt(
+        mongoDatabaseContext.mongoDatabase.getCollection(dbConfig.collection)
+      )
+    } yield collection
 
-//  lazy val programLayer: ZLayer[Any, Nothing, DataSource with NotesService with MongoDatabaseInitializer] =
-//    dataSourceLayer ++ serverLayer ++ (dataSourceLayer >>> mongoDatabaseLayer)
+  def run(): ZIO[Any, Any, Unit] = for {
+    dbConfig <- NotionAppConfig.make()
+    collection <- getMongoCollection(dbConfig)
+    noteTitle <- Console.readLine("Note Title:")
+    noteText <- Console.readLine("Note Text:")
 
-  lazy val run: ZIO[Any, Throwable, Unit] =
-    ZIO.serviceWithZIO[NotesService](noteService => noteService.start())
-        .provide(dataSourceLayer,
-          mongoDatabaseLayer,
-          serverLayer)
+    _ <- ZIO.attempt(
+      collection
+        .insertOne(
+          Document(
+            "_id" -> UUID.randomUUID().toString,
+            "title" -> noteTitle,
+            "body" -> noteText,
+            "count" -> 1,
+            "info" -> Document("f" -> 303, "y" -> 102)
+          )
+        )
+        .printResults()
+    )
+    _ <- ZIO.succeed(
+      collection
+        .find()
+        .results()
+        .foreach(file => Console.printLine(s" - $file"))
+    )
+  } yield ()
+
 }

@@ -1,3 +1,3 @@
 package io.notion.repository
 
-case class DBConfig(hostname: String, port: Int, dbName: String)
+final case class DBConfig(hostname: String, port: Int, dbName: String, collection: String)
