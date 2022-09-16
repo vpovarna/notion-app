@@ -1,7 +1,7 @@
 package io.notion.repository
 
 import io.notion.domain.Note
-import io.notion.repository.status.{Created, ReasonUnknown}
+import io.notion.repository.statuses.{Created, ReasonUnknown}
 import io.notion.utils.DbOperation
 import org.json4s.jackson.Serialization.write
 import org.mongodb.scala

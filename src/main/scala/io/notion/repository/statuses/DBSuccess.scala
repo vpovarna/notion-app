@@ -1,4 +1,4 @@
-package io.notion.repository.status
+package io.notion.repository.statuses
 
 sealed abstract class DbSuccess(val msg: String)
 

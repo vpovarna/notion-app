@@ -1,6 +1,6 @@
 package io.notion
 
-import io.notion.repository.status.{DbError, DbSuccess}
+import io.notion.repository.statuses.{DbError, DbSuccess}
 import org.mongodb.scala.result.InsertOneResult
 import zio._
 
