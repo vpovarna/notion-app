@@ -5,7 +5,7 @@ import java.time.temporal.ChronoUnit
 
 import io.notion.config.NotionAppConfig
 import io.notion.domain.Note
-import io.notion.repository.{DataSource, NoteRepository}
+import io.notion.repository.{DataSource, NoteRepositoryImpl}
 import zio.Random._
 import zio._
 
@@ -22,10 +22,10 @@ object Program {
     dbConfig <- NotionAppConfig.make
     collection <- DataSource(dbConfig).getMongoCollection
     note <- createNote
-    creationStatus <- NoteRepository(collection).addNote(note) <* Console.printLine("Note creation status:info")
+    creationStatus <- NoteRepositoryImpl(collection).addNote(note) <* Console.printLine("Note creation status:info")
     _ <- Console.printLine(creationStatus)
     _ <- Console.printLine(s"Fetching note with id: ${note.id} from DB")
-    document <- NoteRepository(collection).getNoteById(note.id)
+    document <- NoteRepositoryImpl(collection).getNoteById(note.id)
     _ <- Console.printLine(document.get)
   } yield ()
 

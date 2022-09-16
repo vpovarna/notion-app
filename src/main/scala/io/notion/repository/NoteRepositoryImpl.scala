@@ -10,7 +10,13 @@ import org.mongodb.scala.bson.Document
 import org.mongodb.scala.model.Filters._
 import zio.ZIO
 
-final case class NoteRepository(collection: scala.MongoCollection[Document]) {
+trait NoteRepository {
+  def addNote(note: Note): ZIO[Any, Throwable, DBOperation]
+  def getNoteById(id: Int): ZIO[Any, Throwable, Option[Note]]
+}
+
+final case class NoteRepositoryImpl(collection: scala.MongoCollection[Document])
+    extends NoteRepository {
   implicit val formats: DefaultFormats.type = DefaultFormats
 
   def addNote(
@@ -41,7 +47,7 @@ final case class NoteRepository(collection: scala.MongoCollection[Document]) {
   private def parseDocumentToNote(document: Document): Option[Note] =
     Option(document) match {
       case Some(doc) => Some(buildNote(doc))
-      case None => None
+      case None      => None
     }
 
   private def buildNote(doc: Document): Note = {
