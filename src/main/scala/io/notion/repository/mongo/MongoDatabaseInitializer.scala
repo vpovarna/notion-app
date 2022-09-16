@@ -6,7 +6,6 @@ import zio._
 
 final case class MongoDatabaseInitializer(dbConfig: DBConfig) {
 
-  //TODO: Make this class initialize only once
   def initialize: ZIO[Any, Throwable, MongoDatabaseContext] = for {
     _ <- Console.printLine(
       s"Attempting to establish connection to MongoDB host ${dbConfig.hostname}, on port: ${dbConfig.port} with db ${dbConfig.dbName}"
@@ -17,8 +16,7 @@ final case class MongoDatabaseInitializer(dbConfig: DBConfig) {
     mongoDatabase <- ZIO.attempt(
       mongoClient.getDatabase(dbConfig.dbName)
     ) <* Console.printLine("Established connection with database successfully!")
-    databaseContext <- MongoDatabaseContext(mongoDatabase)
-
+    databaseContext = MongoDatabaseContext(mongoDatabase)
   } yield databaseContext
 
 }
