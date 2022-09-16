@@ -27,6 +27,9 @@ object Program {
     _ <- Console.printLine(s"Fetching note with id: ${note.id} from DB")
     document <- NoteRepositoryImpl(collection).getNoteById(note.id)
     _ <- Console.printLine(document.get)
+    _ <- Console.printLine(s"Deleting note with id: ${note.id} from DB")
+    deleteStatus <- NoteRepositoryImpl(collection).deleteNote(note.id)
+    _ <- Console.printLine(deleteStatus)
   } yield ()
 
 }

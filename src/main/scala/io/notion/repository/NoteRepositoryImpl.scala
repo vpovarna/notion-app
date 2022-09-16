@@ -1,7 +1,7 @@
 package io.notion.repository
 
 import io.notion.domain.Note
-import io.notion.repository.statuses.{Created, ReasonUnknown}
+import io.notion.repository.statuses.{Created, Deleted, ReasonUnknown, InvalidId}
 import io.notion.utils.{DBOperation, _}
 import org.json4s.DefaultFormats
 import org.json4s.jackson.Serialization.write
@@ -13,13 +13,14 @@ import zio.ZIO
 trait NoteRepository {
   def addNote(note: Note): ZIO[Any, Throwable, DBOperation]
   def getNoteById(id: Int): ZIO[Any, Throwable, Option[Note]]
+  def deleteNote(id: Int): ZIO[Any, Throwable, DBOperation]
 }
 
 final case class NoteRepositoryImpl(collection: scala.MongoCollection[Document])
     extends NoteRepository {
   implicit val formats: DefaultFormats.type = DefaultFormats
 
-  def addNote(
+  override def addNote(
       note: Note
   ): ZIO[Any, Throwable, DBOperation] = for {
     insertResult <- ZIO.fromFuture { implicit ec =>
@@ -34,7 +35,7 @@ final case class NoteRepositoryImpl(collection: scala.MongoCollection[Document])
     )
   } yield creationStatus
 
-  def getNoteById(id: Int): ZIO[Any, Throwable, Option[Note]] = for {
+  override def getNoteById(id: Int): ZIO[Any, Throwable, Option[Note]] = for {
     document <- ZIO.fromFuture { implicit ec =>
       collection
         .find(equal("id", id))
@@ -43,6 +44,17 @@ final case class NoteRepositoryImpl(collection: scala.MongoCollection[Document])
     }
     note <- ZIO.attempt(parseDocumentToNote(document))
   } yield note
+
+  override def deleteNote(id: Int): ZIO[Any, Throwable, DBOperation] = for {
+    deleteResult <- ZIO.fromFuture { implicit ec =>
+      collection
+        .deleteOne(equal("id", id))
+        .toFuture()
+    }
+    deleteStatus <- deleteResult.fold(deleteResult.getDeletedCount == 1,
+      Deleted(s"Note with id: $id, deleted successfully!"),
+      InvalidId(s"Could not delete Note. Note with id: $id does not exist"))
+  } yield deleteStatus
 
   private def parseDocumentToNote(document: Document): Option[Note] =
     Option(document) match {
@@ -58,4 +70,5 @@ final case class NoteRepositoryImpl(collection: scala.MongoCollection[Document])
       createdAt = doc("createdAt").asInt64().getValue
     )
   }
+
 }

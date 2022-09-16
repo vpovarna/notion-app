@@ -1,14 +1,13 @@
 package io.notion
 
 import io.notion.repository.statuses.{DbError, DbSuccess}
-import org.mongodb.scala.result.InsertOneResult
 import zio._
 
 package object utils {
 
   type DBOperation = Either[DbError, DbSuccess]
 
-  implicit class InsertOneResultWrapper[A <: InsertOneResult](a: A) {
+  implicit class InsertOneResultWrapper[A](a: A) {
     def fold(
         wasAcknowledged: => Boolean,
         onSuccess: => DbSuccess,
