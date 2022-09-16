@@ -12,9 +12,9 @@ import zio._
 object Program {
 
   def createNote: ZIO[Any, IOException, Note] = for {
-    noteTitle <- Console.readLine("Note Title:")
-    noteText <- Console.readLine("Note Text:")
-    id <- nextLong
+    noteTitle <- Console.readLine("Note Title: ")
+    noteText <- Console.readLine("Note Text: ")
+    id <- nextIntBounded(Integer.MAX_VALUE)
     currentTime <- Clock.currentTime(ChronoUnit.MILLIS)
   } yield Note(id, noteTitle, noteText, currentTime)
 
@@ -22,8 +22,11 @@ object Program {
     dbConfig <- NotionAppConfig.make
     collection <- DataSource(dbConfig).getMongoCollection
     note <- createNote
-    creationStatus <- NoteRepository(collection).addNote(note)
+    creationStatus <- NoteRepository(collection).addNote(note) <* Console.printLine("Note creation status:info")
     _ <- Console.printLine(creationStatus)
+    _ <- Console.printLine(s"Fetching note with id: ${note.id} from DB")
+    document <- NoteRepository(collection).getNoteById(note.id)
+    _ <- Console.printLine(document.get)
   } yield ()
 
 }

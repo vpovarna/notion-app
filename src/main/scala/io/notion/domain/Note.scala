@@ -1,7 +1,7 @@
 package io.notion.domain
 
 final case class Note(
-    id: Long,
+    id: Int,
     title: String,
     body: String,
     createdAt: Long
