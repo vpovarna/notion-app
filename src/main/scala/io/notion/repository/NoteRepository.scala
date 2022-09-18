@@ -16,7 +16,7 @@ trait NoteRepository {
   def deleteNote(id: Int): ZIO[Any, Throwable, DBOperation]
 }
 
-final case class NoteRepositoryImpl(collection: scala.MongoCollection[Document])
+final case class NoteRepositoryLive(collection: scala.MongoCollection[Document])
     extends NoteRepository {
   implicit val formats: DefaultFormats.type = DefaultFormats
 
@@ -30,7 +30,7 @@ final case class NoteRepositoryImpl(collection: scala.MongoCollection[Document])
     }
     creationStatus <- insertResult.fold(
       insertResult.wasAcknowledged(),
-      Created(s"Note: $note has been created successfully!"),
+      Created(s"Note with id: ${note.id} has been created successfully!"),
       ReasonUnknown("Unable to create note")
     )
   } yield creationStatus
