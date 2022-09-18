@@ -3,10 +3,10 @@ package io.notion.program
 import java.io.IOException
 import java.time.temporal.ChronoUnit
 
-import io.notion.NoteServiceLive
 import io.notion.config.NotionAppConfig
 import io.notion.domain.Note
 import io.notion.repository.DataSource
+import io.notion.service.NoteServiceLive
 import org.mongodb.scala
 import org.mongodb.scala.bson.Document
 import zio.Random._

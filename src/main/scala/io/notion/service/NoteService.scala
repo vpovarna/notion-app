@@ -1,4 +1,4 @@
-package io.notion
+package io.notion.service
 
 import io.notion.domain.Note
 import io.notion.repository.NoteRepositoryLive
