@@ -11,6 +11,7 @@ import org.mongodb.scala
 import org.mongodb.scala.bson.Document
 import zio.Random._
 import zio._
+import io.notion.utils._
 
 object Program {
   private val delimiterLength = 80
@@ -21,11 +22,12 @@ object Program {
     dbConfig <- NotionAppConfig.make()
     collection <- DataSource(dbConfig).getMongoCollection
     number <- buildApplicationMenu()
-    inputAction = number.trim
-    _ <- ZIO.when(inputAction.toInt == 1)(addNote(collection))
-    _ <- ZIO.when(inputAction.toInt == 2)(deleteNote(collection))
-    _ <- ZIO.when(inputAction.toInt == 3)(getNoteByID(collection))
-    _ <- ZIO.when(inputAction.toInt > 4)(Console.printLine("Invalid selection"))
+    inputAction <- ZIO.attempt(number.trim.toInt).orElseFail(throw new IllegalArgumentException("Invalid input"))
+    _ <- ZIO.when(inputAction == 1)(addNote(collection))
+    _ <- ZIO.when(inputAction == 2)(deleteNote(collection))
+    _ <- ZIO.when(inputAction == 3)(getNoteByID(collection))
+    _ <- ZIO.when(inputAction == 4)(getAllNotes(collection))
+    _ <- ZIO.when(inputAction > 4)(Console.printLine("Invalid selection"))
     _ <- Console.printLine(delimiterLine)
   } yield ()
 
@@ -61,6 +63,15 @@ object Program {
   ): ZIO[Any, Throwable, Unit] = for {
     noteId <- Console.readLine("Provide note id: ") <* Console.printLine("")
     note <- NoteServiceLive(collection).getNoteByID(noteId.toInt)
+    _ <- printNote(note)
+  } yield ()
+
+  private def getAllNotes(collection: scala.MongoCollection[Document]) = for {
+    notes <- NoteServiceLive(collection).getAll()
+    _ <- ZIO.foreach(notes)(printNote)
+  } yield ()
+
+  private def printNote(note: Note): ZIO[Any, IOException, Unit] = for {
     _ <- Console.printLine(delimiterLine) <* Console.printLine(s"Title: ${note.title}")
     _ <- Console.printLine(s"Body: ${note.body}")
     _ <- Console.printLine(s"CreatedAt: ${note.createdAt}")

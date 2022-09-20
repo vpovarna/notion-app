@@ -24,4 +24,5 @@ package object utils {
       dbSuccess => Console.printLine(dbSuccess.msg)
     )
   }
+
 }

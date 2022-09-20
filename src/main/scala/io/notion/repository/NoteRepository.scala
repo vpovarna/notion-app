@@ -1,7 +1,9 @@
 package io.notion.repository
 
+import scala.util.Try
+
 import io.notion.domain.Note
-import io.notion.repository.statuses.{Created, Deleted, ReasonUnknown, InvalidId}
+import io.notion.repository.statuses.{Created, Deleted, InvalidId, ReasonUnknown}
 import io.notion.utils.{DBOperation, _}
 import org.json4s.DefaultFormats
 import org.json4s.jackson.Serialization.write
@@ -14,6 +16,7 @@ trait NoteRepository {
   def addNote(note: Note): ZIO[Any, Throwable, DBOperation]
   def getNoteById(id: Int): ZIO[Any, Throwable, Option[Note]]
   def deleteNote(id: Int): ZIO[Any, Throwable, DBOperation]
+  def getAll(): ZIO[Any, Throwable, List[Note]]
 }
 
 final case class NoteRepositoryLive(collection: scala.MongoCollection[Document])
@@ -51,24 +54,31 @@ final case class NoteRepositoryLive(collection: scala.MongoCollection[Document])
         .deleteOne(equal("id", id))
         .toFuture()
     }
-    deleteStatus <- deleteResult.fold(deleteResult.getDeletedCount == 1,
+    deleteStatus <- deleteResult.fold(
+      deleteResult.getDeletedCount == 1,
       Deleted(s"Note with id: $id, deleted successfully!"),
-      InvalidId(s"Could not delete Note. Note with id: $id does not exist"))
+      InvalidId(s"Could not delete Note. Note with id: $id does not exist")
+    )
   } yield deleteStatus
 
-  private def parseDocumentToNote(document: Document): Option[Note] =
-    Option(document) match {
-      case Some(doc) => Some(buildNote(doc))
-      case None      => None
+  override def getAll(): ZIO[Any, Throwable, List[Note]] = for {
+    documents <- ZIO.fromFuture { implicit ec =>
+      collection
+        .find()
+        .toFuture()
     }
+    notes <- ZIO.attempt(documents.flatMap(parseDocumentToNote).toList)
+  } yield notes
 
-  private def buildNote(doc: Document): Note = {
-    Note(
-      id = doc("id").asInt32().getValue,
-      title = doc("title").asString.getValue,
-      body = doc("body").asString.getValue,
-      createdAt = doc("createdAt").asInt64().getValue
-    )
+  private def parseDocumentToNote(doc: Document): Option[Note] = {
+    Try(
+      Note(
+        id = doc("id").asInt32().getValue,
+        title = doc("title").asString.getValue,
+        body = doc("body").asString.getValue,
+        createdAt = doc("createdAt").asInt64().getValue
+      )
+    ).toOption
   }
 
 }
