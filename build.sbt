@@ -16,4 +16,6 @@ libraryDependencies ++= Seq(
   "org.mongodb.scala" %% "mongo-scala-driver" % mongoVersion
 )
 
+assembly / assemblyJarName := s"$name-fatjar-$version.jar"
+
 testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")
