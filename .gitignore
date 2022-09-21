@@ -1,7 +1,11 @@
 *.class
 *.log
 
-project/
+project/.bloop
+project/project
+project/target
+project/metals.sbt
+
 .idea/
 .bsp/
 .vscode/
