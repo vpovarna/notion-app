@@ -1,10 +1,10 @@
-package io.notion.repository
+package io.mynote.repository
 
 import scala.util.Try
 
-import io.notion.domain.Note
-import io.notion.repository.statuses.{Created, Deleted, InvalidId, ReasonUnknown}
-import io.notion.utils.{DBOperation, _}
+import io.mynote.domain.Note
+import io.mynote.repository.statuses.{Created, Deleted, InvalidId, ReasonUnknown}
+import io.mynote.utils.{DBOperation, _}
 import org.json4s.DefaultFormats
 import org.json4s.jackson.Serialization.write
 import org.mongodb.scala

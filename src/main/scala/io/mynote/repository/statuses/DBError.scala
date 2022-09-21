@@ -1,4 +1,4 @@
-package io.notion.repository.statuses
+package io.mynote.repository.statuses
 
 sealed abstract class DbError(val msg: String)
 

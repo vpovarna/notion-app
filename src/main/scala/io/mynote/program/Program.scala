@@ -1,12 +1,12 @@
-package io.notion.program
+package io.mynote.program
 
 import java.io.IOException
 import java.time.temporal.ChronoUnit
 
-import io.notion.config.NotionAppConfig
-import io.notion.domain.Note
-import io.notion.repository.DataSource
-import io.notion.service.NoteServiceLive
+import io.mynote.config.NotionAppConfig
+import io.mynote.domain.Note
+import io.mynote.repository.DataSource
+import io.mynote.service.NoteServiceLive
 import org.mongodb.scala
 import org.mongodb.scala.bson.Document
 import zio.Random._

@@ -1,6 +1,6 @@
-package io.notion.config
+package io.mynote.config
 
-import io.notion.repository.DBConfig
+import io.mynote.repository.DBConfig
 import zio._
 
 object NotionAppConfig {

@@ -1,8 +1,8 @@
-package io.notion.service
+package io.mynote.service
 
-import io.notion.domain.Note
-import io.notion.repository.NoteRepositoryLive
-import io.notion.utils._
+import io.mynote.domain.Note
+import io.mynote.repository.NoteRepositoryLive
+import io.mynote.utils._
 import org.mongodb.scala
 import org.mongodb.scala.bson.Document
 import zio._

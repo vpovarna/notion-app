@@ -1,8 +1,8 @@
-package io.notion
+package io.mynote
 
 import java.io.IOException
 
-import io.notion.repository.statuses.{DbError, DbSuccess}
+import io.mynote.repository.statuses.{DbError, DbSuccess}
 import zio._
 
 package object utils {

@@ -1,6 +1,6 @@
-package io.notion.repository
+package io.mynote.repository
 
-import io.notion.repository.mongo.MongoDatabaseInitializer
+import io.mynote.repository.mongo.MongoDatabaseInitializer
 import org.mongodb.scala.{Document, MongoCollection}
 import zio.ZIO
 

@@ -1,6 +1,6 @@
-package io.notion
+package io.mynote
 
-import io.notion.program.Program
+import io.mynote.program.Program
 import zio._
 
 object Main extends ZIOAppDefault {

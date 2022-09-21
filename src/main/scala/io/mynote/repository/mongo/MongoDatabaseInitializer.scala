@@ -1,6 +1,6 @@
-package io.notion.repository.mongo
+package io.mynote.repository.mongo
 
-import io.notion.repository.DBConfig
+import io.mynote.repository.DBConfig
 import org.mongodb.scala.MongoClient
 import zio._
 

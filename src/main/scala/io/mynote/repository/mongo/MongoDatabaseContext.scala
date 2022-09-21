@@ -1,4 +1,4 @@
-package io.notion.repository.mongo
+package io.mynote.repository.mongo
 
 import org.mongodb.scala.MongoDatabase
 

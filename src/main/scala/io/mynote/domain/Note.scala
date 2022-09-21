@@ -1,4 +1,4 @@
-package io.notion.domain
+package io.mynote.domain
 
 /**
   * @param id = Unique random generated id. Used to identify a note

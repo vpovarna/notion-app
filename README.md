@@ -1,4 +1,4 @@
-# notion-app
+# MyNoteApp
 Note tacking application using ZIO
 
 Future Ideas:
