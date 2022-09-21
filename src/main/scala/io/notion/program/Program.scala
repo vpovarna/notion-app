@@ -11,7 +11,6 @@ import org.mongodb.scala
 import org.mongodb.scala.bson.Document
 import zio.Random._
 import zio._
-import io.notion.utils._
 
 object Program {
   private val delimiterLength = 80
@@ -21,8 +20,16 @@ object Program {
   def run(): ZIO[Any, Throwable, Unit] = for {
     dbConfig <- NotionAppConfig.make()
     collection <- DataSource(dbConfig).getMongoCollection
+    _ <- actionTrigger(collection).repeat(Schedule.forever)
+  } yield ()
+
+  private def actionTrigger(
+      collection: scala.MongoCollection[Document]
+  ): ZIO[Any, Throwable, Unit] = for {
     number <- buildApplicationMenu()
-    inputAction <- ZIO.attempt(number.trim.toInt).orElseFail(throw new IllegalArgumentException("Invalid input"))
+    inputAction <- ZIO
+      .attempt(number.trim.toInt)
+      .orElseFail(throw new IllegalArgumentException("Invalid input"))
     _ <- ZIO.when(inputAction == 1)(addNote(collection))
     _ <- ZIO.when(inputAction == 2)(deleteNote(collection))
     _ <- ZIO.when(inputAction == 3)(getNoteByID(collection))
@@ -72,7 +79,9 @@ object Program {
   } yield ()
 
   private def printNote(note: Note): ZIO[Any, IOException, Unit] = for {
-    _ <- Console.printLine(delimiterLine) <* Console.printLine(s"Title: ${note.title}")
+    _ <- Console.printLine(delimiterLine) <* Console.printLine(
+      s"Title: ${note.title}"
+    )
     _ <- Console.printLine(s"Body: ${note.body}")
     _ <- Console.printLine(s"CreatedAt: ${note.createdAt}")
   } yield ()
