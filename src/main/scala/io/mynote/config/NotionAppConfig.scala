@@ -9,7 +9,6 @@ object NotionAppConfig {
     endpoint <- System.envOrElse("MONGO_ENDPOINT", "localhost")
     dbPort <- System.envOrElse("MONGO_PORT", "27017").map(_.toInt)
     dbName <- System.envOrElse("MONGO_DB_NAME", "notesdb")
-    collection <- System.envOrElse("MONGO_COLLECTION", "notesdb")
-  } yield DBConfig(endpoint, dbPort, dbName, collection)
+  } yield DBConfig(endpoint, dbPort, dbName)
 
 }

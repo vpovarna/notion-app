@@ -1,35 +1,24 @@
-package io.mynote.program
+package io.mynote.console
 
 import java.io.IOException
 import java.time.temporal.ChronoUnit
 
-import io.mynote.config.NotionAppConfig
 import io.mynote.domain.Note
-import io.mynote.repository.DataSource
 import io.mynote.service.NoteServiceLive
 import org.mongodb.scala
 import org.mongodb.scala.bson.Document
-import zio.Random._
+import zio.Random.nextIntBounded
 import zio._
 
-object Program {
-  private val delimiterLength = 80
-  private val delimiterChar = "-"
-  private val delimiterLine = delimiterChar * delimiterLength
+object NoteActions {
 
-  def run(): ZIO[Any, Throwable, Unit] = for {
-    dbConfig <- NotionAppConfig.make()
-    collection <- DataSource(dbConfig).getMongoCollection
-    _ <- actionTrigger(collection).repeat(Schedule.forever)
-  } yield ()
-
-  private def actionTrigger(
+  def noteActionTrigger(
       collection: scala.MongoCollection[Document]
   ): ZIO[Any, Throwable, Unit] = for {
     number <- buildApplicationMenu()
     inputAction <- ZIO
       .attempt(number.trim.toInt)
-      .orElseFail(throw new IllegalArgumentException("Invalid input"))
+      .orElseFail(throw new IllegalArgumentException("Invalid selection"))
     _ <- ZIO.when(inputAction == 1)(addNote(collection))
     _ <- ZIO.when(inputAction == 2)(deleteNote(collection))
     _ <- ZIO.when(inputAction == 3)(getNoteByID(collection))
@@ -92,5 +81,4 @@ object Program {
     noteId <- Console.readLine("Provide note id: ") <* Console.printLine("")
     _ <- NoteServiceLive(collection).deleteNote(noteId.toInt)
   } yield ()
-
 }
