@@ -1,5 +1,5 @@
 # MyNoteApp
-Note tacking application using ZIO
+Console note tacking application using ZIO
 
 ### Running the application locally
 Start MongoDB Container
