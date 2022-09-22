@@ -19,7 +19,7 @@ trait NoteRepository {
   def getAll(): ZIO[Any, Throwable, List[Note]]
 }
 
-final case class NoteRepositoryLive(collection: scala.MongoCollection[Document])
+final case class MongoNoteRepositoryLive(collection: scala.MongoCollection[Document])
     extends NoteRepository {
   implicit val formats: DefaultFormats.type = DefaultFormats
 
