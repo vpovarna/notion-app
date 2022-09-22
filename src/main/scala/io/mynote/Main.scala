@@ -1,6 +1,6 @@
 package io.mynote
 
-import io.mynote.program.Program
+import io.mynote.console.Program
 import zio._
 
 object Main extends ZIOAppDefault {
