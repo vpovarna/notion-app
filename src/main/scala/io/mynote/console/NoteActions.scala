@@ -4,13 +4,14 @@ import java.io.IOException
 import java.time.temporal.ChronoUnit
 
 import io.mynote.domain.Note
+import io.mynote.repository.mongo.MongoDatabaseContext
 import io.mynote.service.NoteServiceLive
 import org.mongodb.scala
 import org.mongodb.scala.bson.Document
 import zio.Random.nextIntBounded
 import zio._
 
-object NoteActions {
+case class NoteActions(mongoDatabaseContext: MongoDatabaseContext) {
 
   def noteActionTrigger(
       collection: scala.MongoCollection[Document]
@@ -19,6 +20,7 @@ object NoteActions {
     inputAction <- ZIO
       .attempt(number.trim.toInt)
       .orElseFail(throw new IllegalArgumentException("Invalid selection"))
+    _ <- ZIO.when(inputAction == 0)(CollectionActions(mongoDatabaseContext).actionsTrigger())
     _ <- ZIO.when(inputAction == 1)(addNote(collection))
     _ <- ZIO.when(inputAction == 2)(deleteNote(collection))
     _ <- ZIO.when(inputAction == 3)(getNoteByID(collection))
@@ -36,6 +38,7 @@ object NoteActions {
         |  2. Delete a note
         |  3. Get note by id
         |  4. Get all notes
+        |  0. Return to previous menu
         |
         |To stop the application at any time press CTRL+C
        """.stripMargin

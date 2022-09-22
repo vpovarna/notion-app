@@ -10,8 +10,6 @@ object Program {
     dbConfig <- NotionAppConfig.make()
     mongoDatabaseContext <- MongoDatabaseInitializer(dbConfig).initialize
     _ <- CollectionActions(mongoDatabaseContext).actionsTrigger()
-    //     collection <- MongoCollectionLive(mongoDatabaseContext).getMongoCollection
-    //    _ <- noteActionTrigger(collection).repeat(Schedule.forever)
   } yield ()
 
 }

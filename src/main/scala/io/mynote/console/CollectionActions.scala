@@ -1,6 +1,5 @@
 package io.mynote.console
 
-import io.mynote.console.NoteActions.noteActionTrigger
 import io.mynote.repository.mongo.{MongoCollectionLive, MongoDatabaseContext}
 import zio.{Console, Schedule, ZIO}
 
@@ -66,7 +65,7 @@ case class CollectionActions(mongoDatabaseContext: MongoDatabaseContext) {
   ): ZIO[Any, Throwable, Unit] = for {
     mongoCollection <- MongoCollectionLive(mongoDatabaseContext)
       .getMongoCollection(collectionName)
-    _ <- noteActionTrigger(mongoCollection).repeat(Schedule.forever)
+    _ <- NoteActions(mongoDatabaseContext).noteActionTrigger(mongoCollection).repeat(Schedule.forever)
   } yield ()
 
   private def fetchAllCollections: ZIO[Any, Throwable, List[String]] = for {
