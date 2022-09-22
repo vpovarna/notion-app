@@ -13,15 +13,21 @@ case class CollectionActions(mongoDatabaseContext: MongoDatabaseContext) {
       .orElseFail(throw new IllegalArgumentException("Invalid selection"))
     _ <- ZIO.when(inputAction == 1)(getAllCollections)
     _ <- ZIO.when(inputAction == 2)(useCollection())
+    _ <- ZIO.when(inputAction == 3)(addCollection())
     _ <- ZIO.when(inputAction > 3)(Console.printLine("Invalid selection"))
     _ <- Console.printLine(delimiterLine)
   } yield ()
 
   private def collectionMenu(): ZIO[Any, Throwable, String] = for {
+    _ <- Console.printLine(delimiterLine)
     _ <- Console.printLine(
       """Provide the number corresponding to the desired action:
-      | 1. Get all collections
-      | 2. Use collection
+      |
+      |  1. Get all collections
+      |  2. Use collection
+      |  3. Add a new collection
+      |
+      |To stop the application at any time press CTRL+C
      """.stripMargin
     )
     action <- Console.readLine("Your selection: ") <* Console.printLine("")
@@ -29,11 +35,38 @@ case class CollectionActions(mongoDatabaseContext: MongoDatabaseContext) {
 
   private def getAllCollections: ZIO[Any, Throwable, Unit] = for {
     collections <- fetchAllCollections
-    _ <- Console.printLine(delimiterLine) *> Console.printLine(
-      "The existing collections are: "
-    ) *> ZIO.foreach(collections)(collection =>
-      Console.printLine(s"\t $collection")
-    )
+    _ <- Console.printLine(delimiterLine)
+    _ <- Console.printLine("The existing collections are: ")
+    _ <-
+      ZIO.foreach(collections)(collection =>
+        Console.printLine(s"\t $collection")
+      ) *>
+        actionsTrigger().repeat(Schedule.forever)
+  } yield ()
+
+  private def useCollection(): ZIO[Any, Throwable, Unit] = for {
+    collectionName <- Console.readLine("Collection name: ")
+    dbCollections <- fetchAllCollections
+    _ <-
+      if (dbCollections.contains(collectionName))
+        getMongoCollection(collectionName)
+      else
+        Console.printLine("") *>
+          Console.printLine("Provided collection doesn't exist!") *>
+          actionsTrigger().repeat(Schedule.forever)
+  } yield ()
+
+  private def addCollection(): ZIO[Any, Throwable, Unit] = for {
+    collectionName <- Console.readLine("Collection name: ")
+    _ <- getMongoCollection(collectionName)
+  } yield ()
+
+  private def getMongoCollection(
+      collectionName: String
+  ): ZIO[Any, Throwable, Unit] = for {
+    mongoCollection <- MongoCollectionLive(mongoDatabaseContext)
+      .getMongoCollection(collectionName)
+    _ <- noteActionTrigger(mongoCollection).repeat(Schedule.forever)
   } yield ()
 
   private def fetchAllCollections: ZIO[Any, Throwable, List[String]] = for {
@@ -47,16 +80,4 @@ case class CollectionActions(mongoDatabaseContext: MongoDatabaseContext) {
       }.head()
     )
   } yield collectionNameList
-
-  private def useCollection(): ZIO[Any, Throwable, Unit] = for {
-    collectionName <- Console.readLine("Collection name: ")
-    dbCollections <- getAllCollections
-
-    // TODO: validate if the collection is allready part of the DB
-    collection <- MongoCollectionLive(mongoDatabaseContext).getMongoCollection(
-      collectionName
-    )
-    _ <- noteActionTrigger(collection).repeat(Schedule.forever)
-  } yield ()
-
 }

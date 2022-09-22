@@ -31,10 +31,13 @@ object NoteActions {
     _ <- Console.printLine(delimiterLine)
     _ <- Console.printLine(
       """Provide the number corresponding to the desired action:
-        | 1. Add new note
-        | 2. Delete a note
-        | 3. Get note by id
-        | 4. Get all notes
+        |
+        |  1. Add new note
+        |  2. Delete a note
+        |  3. Get note by id
+        |  4. Get all notes
+        |
+        |To stop the application at any time press CTRL+C
        """.stripMargin
     )
     action <- Console.readLine("Your selection: ") <* Console.printLine("")
