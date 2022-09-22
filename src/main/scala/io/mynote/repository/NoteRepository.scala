@@ -16,7 +16,7 @@ trait NoteRepository {
   def addNote(note: Note): ZIO[Any, Throwable, DBOperation]
   def getNoteById(id: Int): ZIO[Any, Throwable, Option[Note]]
   def deleteNote(id: Int): ZIO[Any, Throwable, DBOperation]
-  def getAll(): ZIO[Any, Throwable, List[Note]]
+  def getAll: ZIO[Any, Throwable, List[Note]]
 }
 
 final case class MongoNoteRepositoryLive(collection: scala.MongoCollection[Document])
@@ -61,7 +61,7 @@ final case class MongoNoteRepositoryLive(collection: scala.MongoCollection[Docum
     )
   } yield deleteStatus
 
-  override def getAll(): ZIO[Any, Throwable, List[Note]] = for {
+  override def getAll: ZIO[Any, Throwable, List[Note]] = for {
     documents <- ZIO.fromFuture { implicit ec =>
       collection
         .find()

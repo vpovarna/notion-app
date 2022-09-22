@@ -11,7 +11,7 @@ trait NoteService {
   def addNote(note: Note): ZIO[Any, Throwable, Unit]
   def getNoteByID(id: Int): ZIO[Any, Throwable, Note]
   def deleteNote(id: Int): ZIO[Any, Throwable, Unit]
-  def getAll(): ZIO[Any, Throwable, List[Note]]
+  def getAll: ZIO[Any, Throwable, List[Note]]
 }
 
 final case class NoteServiceLive(collection: scala.MongoCollection[Document])
@@ -35,7 +35,7 @@ final case class NoteServiceLive(collection: scala.MongoCollection[Document])
     _ <- deleteStatus.printResult()
   } yield ()
 
-  override def getAll(): ZIO[Any, Throwable, List[Note]] = for {
-    notes <- MongoNoteRepositoryLive(collection).getAll()
+  override def getAll: ZIO[Any, Throwable, List[Note]] = for {
+    notes <- MongoNoteRepositoryLive(collection).getAll
   } yield notes
 }

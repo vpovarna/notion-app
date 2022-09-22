@@ -65,8 +65,8 @@ object NoteActions {
     _ <- printNote(note)
   } yield ()
 
-  private def getAllNotes(collection: scala.MongoCollection[Document]) = for {
-    notes <- NoteServiceLive(collection).getAll()
+  private def getAllNotes(collection: scala.MongoCollection[Document]): ZIO[Any, Throwable, Unit] = for {
+    notes <- NoteServiceLive(collection).getAll
     _ <- ZIO.foreach(notes)(printNote)
   } yield ()
 
