@@ -8,7 +8,8 @@ object Program {
 
   def run(): ZIO[Any, Throwable, Unit] = for {
     dbConfig <- NotionAppConfig.make()
-    mongoDatabaseContext <- MongoDatabaseInitializer(dbConfig).initialize
+    mongoDatabaseContextRef <- MongoDatabaseInitializer(dbConfig).initialize
+    mongoDatabaseContext <- mongoDatabaseContextRef.get
     _ <- CollectionActions(mongoDatabaseContext).actionsTrigger()
   } yield ()
 
