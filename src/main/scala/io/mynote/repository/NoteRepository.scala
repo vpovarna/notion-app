@@ -29,7 +29,7 @@ final case class MongoNoteRepositoryLive(collection: scala.MongoCollection[Docum
     insertResult <- ZIO.fromFuture { implicit ec =>
       collection
         .insertOne(Document(write(note)))
-        .toFuture
+        .toFuture()
     }
     creationStatus <- insertResult.fold(
       insertResult.wasAcknowledged(),
