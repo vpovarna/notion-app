@@ -1,5 +1,7 @@
 # MyNoteApp
-Note tacking application using ZIO
+Console note tacking application using ZIO
+
+[![Build Status](https://travis-ci.org/knoldus/scalajobz.png?branch=master)](https://travis-ci.org/MyNoteApp) for Travis CI passing
 
 ### Running the application locally
 Start MongoDB Container
